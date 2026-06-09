@@ -17,9 +17,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Download spaCy model and NLTK data
-RUN python -m spacy download en_core_web_sm
-RUN python -m nltk.downloader stopwords punkt
+# Download spaCy model and NLTK data (Commented out to run in lightweight fallback mode on Render)
+# RUN python -m spacy download en_core_web_sm
+# RUN python -m nltk.downloader stopwords punkt
+
 
 # Copy application source
 COPY . .
