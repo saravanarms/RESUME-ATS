@@ -1,0 +1,38 @@
+# .gitignore for Resume Analyzer project
+
+# local .NET SDK
+.dotnet/
+
+# Python Virtual Environment
+venv/
+.venv/
+__pycache__/
+*.pyc
+
+# Local SQLite databases
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
+
+# Build artifacts
+bin/
+obj/
+Publish/
+out/
+
+# Git Portable folders and installer
+git-portable.exe
+git/
+
+# IDE configurations
+.vs/
+.idea/
+*.user
+*.suo
+*.sln.docstates
+
+# OS generated files
+Thumbs.db
+ehthumbs.db
+Desktop.ini

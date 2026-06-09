@@ -1,0 +1,17 @@
+name: Deploy Backend to Render.com
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'src/ResumeAnalyzer.Backend/**'
+
+jobs:
+  trigger-render-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Trigger Render Deployment Webhook
+      run: |
+        curl -f "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"

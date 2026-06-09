@@ -1,0 +1,243 @@
+@model AnalysisResultViewModel
+@{
+    ViewData["Title"] = "Resume Analysis Result";
+    
+    // Determine category based on score
+    string rating = "Poor";
+    string ratingClass = "badge-poor text-danger";
+    string ratingColor = "#ef4444";
+    if (Model.AtsScore >= 90)
+    {
+        rating = "Excellent";
+        ratingClass = "badge-excellent text-success";
+        ratingColor = "#22c55e";
+    }
+    else if (Model.AtsScore >= 70)
+    {
+        rating = "Good";
+        ratingClass = "badge-good text-primary";
+        ratingColor = "#2563eb";
+    }
+    else if (Model.AtsScore >= 50)
+    {
+        rating = "Average";
+        ratingClass = "badge-average text-warning";
+        ratingColor = "#f59e0b";
+    }
+    
+    // Calculate circular dashoffset: circum = 2 * pi * r = 2 * 3.14159 * 70 = 439.82 -> ~440
+    int circumference = 440;
+    int dashoffset = circumference - (Model.AtsScore * circumference / 100);
+}
+
+<div class="row mb-5 align-items-center justify-content-between animate-fade-in-up">
+    <div class="col-md-8">
+        <span class="text-secondary small fw-bold">ANALYSIS COMPLETED</span>
+        <h1 class="fw-extrabold" style="font-family: 'Outfit', sans-serif;">ATS Audit Report</h1>
+        <p class="text-secondary mb-0">Matched against job profile: <strong>@Model.JobTitle</strong></p>
+    </div>
+    <div class="col-md-4 text-md-end mt-3 mt-md-0">
+        <button onclick="window.print()" class="btn btn-outline-secondary px-4 py-2 me-2">
+            <i class="bi bi-printer me-2"></i>Print Report
+        </button>
+        <a href="@Model.BlobUrl" target="_blank" class="btn btn-primary-gradient px-4 py-2">
+            <i class="bi bi-file-earmark-arrow-down-fill me-2"></i>Download Original
+        </a>
+    </div>
+</div>
+
+<div class="row g-4 mb-5 animate-fade-in-up" style="animation-delay: 0.1s;">
+    <!-- Score Gauge Card -->
+    <div class="col-lg-4">
+        <div class="glass-card p-5 h-100 text-center d-flex flex-column justify-content-center">
+            <div class="ats-gauge-container mb-4">
+                <svg class="ats-gauge-svg" width="180" height="180">
+                    <circle class="ats-gauge-track" cx="90" cy="90" r="75" />
+                    <circle class="ats-gauge-progress" cx="90" cy="90" r="75" 
+                            style="stroke: @ratingColor; stroke-dasharray: 471; stroke-dashoffset: @(471 - (Model.AtsScore * 471 / 100));" />
+                </svg>
+                <div class="ats-gauge-value" style="color: @ratingColor">@Model.AtsScore%</div>
+            </div>
+            
+            <h3 class="fw-bold mb-2" style="font-family: 'Outfit', sans-serif;">ATS Match Score</h3>
+            <div>
+                <span class="badge @ratingClass rounded-pill px-4 py-2 fs-6">
+                    @rating Rating
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Summary Card -->
+    <div class="col-lg-8">
+        <div class="glass-card p-5 h-100">
+            <h3 class="fw-bold mb-4" style="font-family: 'Outfit', sans-serif;">AI Resume Summary</h3>
+            <p class="lead text-secondary fs-5 lh-base mb-4">
+                @Model.ResumeSummary
+            </p>
+            <div class="row g-3">
+                <div class="col-sm-6">
+                    <div class="p-3 border rounded-3 bg-light bg-opacity-10">
+                        <span class="small text-secondary d-block">Keyword Alignment</span>
+                        <span class="fw-bold fs-5">@Model.KeywordMatchPercentage% matched</span>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="p-3 border rounded-3 bg-light bg-opacity-10">
+                        <span class="small text-secondary d-block">Identified Skills</span>
+                        <span class="fw-bold fs-5">@Model.MissingSkills.Length missing core</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tabs for Deep Audit Details -->
+<div class="row animate-fade-in-up" style="animation-delay: 0.2s;">
+    <div class="col-12">
+        <div class="glass-card p-5">
+            <!-- Tab Headers -->
+            <ul class="nav nav-pills mb-4 pb-3 border-bottom gap-2" id="auditTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active px-4 py-2.5 rounded-pill fw-semibold" id="skills-tab" data-bs-toggle="tab" data-bs-target="#skills-content" type="button" role="tab" aria-controls="skills-content" aria-selected="true">
+                        <i class="bi bi-tags-fill me-2"></i>Skills & Keywords
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link px-4 py-2.5 rounded-pill fw-semibold" id="formatting-tab" data-bs-toggle="tab" data-bs-target="#formatting-content" type="button" role="tab" aria-controls="formatting-content" aria-selected="false">
+                        <i class="bi bi-layout-text-window-reverse me-2"></i>Formatting & Grammar
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link px-4 py-2.5 rounded-pill fw-semibold" id="recommendations-tab" data-bs-toggle="tab" data-bs-target="#recommendations-content" type="button" role="tab" aria-controls="recommendations-content" aria-selected="false">
+                        <i class="bi bi-lightbulb-fill me-2"></i>AI Recommendations
+                    </button>
+                </li>
+            </ul>
+
+            <!-- Tab Content -->
+            <div class="tab-content" id="auditTabsContent">
+                <!-- Skills Tab -->
+                <div class="tab-pane fade show active" id="skills-content" role="tabpanel" aria-labelledby="skills-tab">
+                    <div class="mb-5">
+                        <h4 class="fw-bold text-danger mb-3" style="font-family: 'Outfit', sans-serif;">
+                            <i class="bi bi-x-circle-fill me-2"></i>Missing Core Skills
+                        </h4>
+                        <p class="text-secondary small mb-3">Add these exact skills to your resume where you have experience to clear keyword queries:</p>
+                        @if (Model.MissingSkills.Any())
+                        {
+                            <div class="d-flex flex-wrap gap-2">
+                                @foreach (var skill in Model.MissingSkills)
+                                {
+                                    <span class="badge badge-missing-skill">@skill</span>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="alert alert-success border-0 rounded-3 small">
+                                <i class="bi bi-check-circle-fill me-2"></i>Excellent! No critical skill gaps identified.
+                            </div>
+                        }
+                    </div>
+
+                    <div>
+                        <h4 class="fw-bold mb-3" style="font-family: 'Outfit', sans-serif;">Keyword Density Rating</h4>
+                        <p class="text-secondary small">Your resume contains a <strong>@Model.KeywordMatchPercentage%</strong> match for secondary keywords found inside the job description.</p>
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar bg-primary" role="progressbar" style="width: @Model.KeywordMatchPercentage%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Formatting Tab -->
+                <div class="tab-pane fade" id="formatting-content" role="tabpanel" aria-labelledby="formatting-tab">
+                    <div class="mb-5">
+                        <h4 class="fw-bold mb-3 text-warning" style="font-family: 'Outfit', sans-serif;">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>Formatting Audit
+                        </h4>
+                        @if (Model.FormattingIssues.Any())
+                        {
+                            <ul class="list-group list-group-flush bg-transparent">
+                                @foreach (var issue in Model.FormattingIssues)
+                                {
+                                    <li class="list-group-item bg-transparent text-secondary py-3 d-flex align-items-center">
+                                        <i class="bi bi-dash-circle-fill text-warning me-3"></i>
+                                        @issue
+                                    </li>
+                                }
+                            </ul>
+                        }
+                        else
+                        {
+                            <div class="alert alert-success border-0 rounded-3 small">
+                                <i class="bi bi-check-circle-fill me-2"></i>Your resume formatting is clean and easy for scanner systems to process.
+                            </div>
+                        }
+                    </div>
+
+                    <div>
+                        <h4 class="fw-bold mb-3" style="font-family: 'Outfit', sans-serif;">Grammar & Typing suggestions</h4>
+                        @if (Model.GrammarSuggestions.Any())
+                        {
+                            <ul class="list-group list-group-flush bg-transparent">
+                                @foreach (var suggestion in Model.GrammarSuggestions)
+                                {
+                                    <li class="list-group-item bg-transparent text-secondary py-3 d-flex align-items-center">
+                                        <i class="bi bi-pencil-square text-primary me-3"></i>
+                                        @suggestion
+                                    </li>
+                                }
+                            </ul>
+                        }
+                        else
+                        {
+                            <p class="text-secondary small mb-0">No spelling anomalies or duplicate double spacing issues detected.</p>
+                        }
+                    </div>
+                </div>
+
+                <!-- Recommendations Tab -->
+                <div class="tab-pane fade" id="recommendations-content" role="tabpanel" aria-labelledby="recommendations-tab">
+                    <h4 class="fw-bold text-success mb-4" style="font-family: 'Outfit', sans-serif;">
+                        <i class="bi bi-lightbulb-fill me-2"></i>AI Action Plan
+                    </h4>
+                    <p class="text-secondary small">Follow this step-by-step roadmap to enhance match scores:</p>
+                    <ul class="list-group list-group-flush bg-transparent">
+                        @foreach (var rec in Model.Recommendations)
+                        {
+                            <li class="list-group-item bg-transparent text-secondary py-3 d-flex align-items-start">
+                                <i class="bi bi-check-circle-fill text-success fs-5 me-3 mt-0.5"></i>
+                                <div>
+                                    <p class="mb-0 fw-semibold text-dark">@rec</p>
+                                </div>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    @@media print {
+        header, footer, .btn, .nav-pills, .navbar {
+            display: none !important;
+        }
+        body {
+            background-color: white !important;
+            color: black !important;
+        }
+        .glass-card {
+            box-shadow: none !important;
+            border: 1px solid #ddd !important;
+            background: transparent !important;
+        }
+        .tab-content > .tab-pane {
+            display: block !important;
+            opacity: 1 !important;
+        }
+    }
+</style>

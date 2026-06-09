@@ -1,0 +1,215 @@
+@model IEnumerable<ResumeAnalyzer.Domain.Entities.SubscriptionPlan>
+@{
+    ViewData["Title"] = "AI Powered ATS Resume Analyzer";
+}
+
+<!-- Hero Section -->
+<section class="py-5 mb-5 text-center text-lg-start animate-fade-in-up">
+    <div class="row align-items-center">
+        <div class="col-lg-6 mb-5 mb-lg-0">
+            <span class="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill mb-3 fw-bold">Introducing AI V2 Parser</span>
+            <h1 class="display-3 fw-black tracking-tight mb-4" style="font-family: 'Outfit', sans-serif;">
+                Optimize Your Resume for <span class="navbar-brand-gradient">ATS Success</span>
+            </h1>
+            <p class="lead text-secondary mb-4 fs-5" style="max-width: 500px;">
+                Upload your resume, compare it against any job description, find missing keywords, and get detailed AI-powered improvement suggestions instantly.
+            </p>
+            <div class="d-flex flex-column flex-sm-row justify-content-center justify-content-lg-start gap-3">
+                <a asp-controller="Resume" asp-action="Upload" class="btn btn-primary-gradient btn-lg px-5 py-3">Analyze Your Resume</a>
+                <a href="#pricing" class="btn btn-outline-secondary btn-lg px-4 py-3">View Pricing</a>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <!-- ATS Score Preview Card Mockup -->
+            <div class="glass-card p-4 mx-auto pulse-accent-glow" style="max-width: 500px; border-radius: var(--border-radius-lg);">
+                <div class="d-flex align-items-center justify-content-between mb-4 border-bottom pb-3">
+                    <div>
+                        <h5 class="mb-0 fw-bold">ATS Audit Preview</h5>
+                        <span class="text-muted small">SoftwareEngineer_Resume.pdf</span>
+                    </div>
+                    <span class="badge bg-success-subtle text-success py-1 px-3 rounded">Analyzed</span>
+                </div>
+                
+                <div class="row align-items-center mb-4">
+                    <div class="col-sm-5 text-center">
+                        <div class="ats-gauge-container">
+                            <svg class="ats-gauge-svg" width="160" height="160">
+                                <circle class="ats-gauge-track" cx="80" cy="80" r="70" />
+                                <circle class="ats-gauge-progress" cx="80" cy="80" r="70" style="stroke: #22c55e; stroke-dasharray: 440; stroke-dashoffset: 52;" />
+                            </svg>
+                            <div class="ats-gauge-value text-success">88%</div>
+                        </div>
+                    </div>
+                    <div class="col-sm-7">
+                        <h6 class="fw-bold mb-2">Match Rating: Excellent</h6>
+                        <p class="text-secondary small mb-3">Your resume matches 88% of the core competencies and formatting guidelines for this job description.</p>
+                        <div class="d-flex flex-wrap gap-2">
+                            <span class="badge badge-skill">Python</span>
+                            <span class="badge badge-skill">FastAPI</span>
+                            <span class="badge badge-skill">Docker</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <div class="d-flex align-items-center justify-content-between mb-1">
+                        <span class="small fw-semibold text-secondary">Keyword Match</span>
+                        <span class="small fw-bold text-success">92%</span>
+                    </div>
+                    <div class="progress" style="height: 6px;">
+                        <div class="progress-bar bg-success" role="progressbar" style="width: 92%"></div>
+                    </div>
+                </div>
+
+                <div>
+                    <h6 class="small fw-bold text-danger mb-2"><i class="bi bi-x-circle-fill me-1"></i> Missing Core Skills</h6>
+                    <div class="d-flex flex-wrap gap-2">
+                        <span class="badge badge-missing-skill">Kubernetes</span>
+                        <span class="badge badge-missing-skill">PostgreSQL</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="py-5 mb-5 bg-white-50 rounded-4 px-4 px-md-5" style="background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(12px);">
+    <div class="text-center mb-5">
+        <h2 class="display-5 fw-bold" style="font-family: 'Outfit', sans-serif;">Powerful Analysis Features</h2>
+        <p class="text-secondary lead">Designed to help you beat the applicant tracking systems</p>
+    </div>
+    
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="glass-card p-4 h-100">
+                <div class="text-primary mb-3">
+                    <i class="bi bi-file-earmark-text display-5"></i>
+                </div>
+                <h4 class="fw-bold mb-3">PDF & DOCX Parsing</h4>
+                <p class="text-secondary mb-0">High-performance extraction pipeline handles double columns, complex layout structures, and nested tables effortlessly.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="glass-card p-4 h-100">
+                <div class="text-accent mb-3">
+                    <i class="bi bi-cpu display-5"></i>
+                </div>
+                <h4 class="fw-bold mb-3">spaCy NLP Analytics</h4>
+                <p class="text-secondary mb-0">Identifies soft skills, industry certifications, university degrees, and years of experience dynamically using natural language processing.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="glass-card p-4 h-100">
+                <div class="text-success mb-3">
+                    <i class="bi bi-bullseye display-5"></i>
+                </div>
+                <h4 class="fw-bold mb-3">ATS Scoring Engine</h4>
+                <p class="text-secondary mb-0">Matches your content directly with requirements inside the job description, calculating skill gaps and rating keyword densities.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Pricing Section -->
+<section id="pricing" class="py-5 mb-5">
+    <div class="text-center mb-5">
+        <h2 class="display-5 fw-bold" style="font-family: 'Outfit', sans-serif;">Simple, Transparent Pricing</h2>
+        <p class="text-secondary lead">Upgrade as your job search scales up</p>
+    </div>
+
+    <div class="row g-4 justify-content-center">
+        @if (Model != null)
+        {
+            @foreach (var plan in Model)
+            {
+                <div class="col-md-4 col-sm-10">
+                    <div class="glass-card p-5 h-100 d-flex flex-column text-center @(plan.Id == 2 ? "border-primary border-2 shadow-xl position-relative" : "")">
+                        @if (plan.Id == 2)
+                        {
+                            <span class="badge bg-primary text-white position-absolute top-0 start-50 translate-middle py-2 px-3 fw-bold rounded-pill">Most Popular</span>
+                        }
+                        <h4 class="fw-bold mb-2">@plan.Name Plan</h4>
+                        <div class="mb-4">
+                            <span class="display-4 fw-extrabold">$@plan.Price</span>
+                            <span class="text-muted">/month</span>
+                        </div>
+                        <p class="text-secondary mb-4">Analyze up to <strong>@plan.MaxResumesPerMonth</strong> resumes per month.</p>
+                        
+                        <ul class="list-unstyled text-start mb-5 flex-grow-1">
+                            @if (!string.IsNullOrEmpty(plan.FeaturesJson))
+                            {
+                                var features = System.Text.Json.JsonSerializer.Deserialize<string[]>(plan.FeaturesJson);
+                                if (features != null)
+                                {
+                                    @foreach (var feature in features)
+                                    {
+                                        <li class="mb-3 small d-flex align-items-center">
+                                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                            @feature
+                                        </li>
+                                    }
+                                }
+                            }
+                        </ul>
+                        
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            <a asp-controller="Dashboard" asp-action="Index" class="btn @(plan.Id == 2 ? "btn-primary-gradient" : "btn-outline-secondary") w-100 py-3">Activate Account</a>
+                        }
+                        else
+                        {
+                            <a asp-controller="Account" asp-action="Register" class="btn @(plan.Id == 2 ? "btn-primary-gradient" : "btn-outline-secondary") w-100 py-3">Choose @plan.Name</a>
+                        }
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</section>
+
+<!-- FAQ Section -->
+<section class="py-5 mb-5" style="max-width: 800px; margin: 0 auto;">
+    <div class="text-center mb-5">
+        <h2 class="display-5 fw-bold" style="font-family: 'Outfit', sans-serif;">Frequently Asked Questions</h2>
+    </div>
+
+    <div class="accordion accordion-flush shadow rounded-4 overflow-hidden border" id="faqAccordion">
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingOne">
+                <button class="accordion-button collapsed fw-bold py-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                    How is the ATS Score calculated?
+                </button>
+            </h2>
+            <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#faqAccordion">
+                <div class="accordion-body text-secondary">
+                    Our system compares the technical skills, soft skills, educational degree, and experience years extracted from your resume against the requirements of the job description. The final score is a weighted composite of skill matches, keyword alignment, formatting validation, and experience levels.
+                </div>
+            </div>
+        </div>
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingTwo">
+                <button class="accordion-button collapsed fw-bold py-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                    Are PDF files preferred over Microsoft Word (DOCX) files?
+                </button>
+            </h2>
+            <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#faqAccordion">
+                <div class="accordion-body text-secondary">
+                    Modern Applicant Tracking Systems support both formats. However, PDF ensures your formatting is perfectly locked, while DOCX is highly readable. Our parser extracts text from both file types with zero readability loss.
+                </div>
+            </div>
+        </div>
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingThree">
+                <button class="accordion-button collapsed fw-bold py-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                    Is my resume data kept secure?
+                </button>
+            </h2>
+            <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#faqAccordion">
+                <div class="accordion-body text-secondary">
+                    Yes. All files are securely uploaded directly to encrypted Azure Blob Storage containers, and database connections are stored securely inside Azure Key Vault. We never sell your personal information or share resume text.
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

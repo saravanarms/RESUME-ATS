@@ -1,0 +1,51 @@
+@model RegisterViewModel
+@{
+    ViewData["Title"] = "Create Account";
+}
+
+<div class="row justify-content-center py-5 animate-fade-in-up">
+    <div class="col-md-5">
+        <div class="glass-card p-5">
+            <div class="text-center mb-4">
+                <i class="bi bi-person-plus-fill text-primary display-4 mb-2"></i>
+                <h2 class="fw-bold" style="font-family: 'Outfit', sans-serif;">Create an Account</h2>
+                <p class="text-secondary small">Get started with professional ATS checks</p>
+            </div>
+
+            <form asp-controller="Account" asp-action="Register" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+
+                <div class="form-floating mb-3">
+                    <input asp-for="FullName" class="form-control bg-transparent" placeholder="John Doe" required />
+                    <label asp-for="FullName"></label>
+                    <span asp-validation-for="FullName" class="text-danger small"></span>
+                </div>
+
+                <div class="form-floating mb-3">
+                    <input asp-for="Email" class="form-control bg-transparent" type="email" placeholder="name@example.com" required />
+                    <label asp-for="Email"></label>
+                    <span asp-validation-for="Email" class="text-danger small"></span>
+                </div>
+
+                <div class="form-floating mb-3">
+                    <input asp-for="Password" class="form-control bg-transparent" type="password" placeholder="Password" required />
+                    <label asp-for="Password"></label>
+                    <span asp-validation-for="Password" class="text-danger small"></span>
+                </div>
+
+                <div class="form-floating mb-4">
+                    <input asp-for="ConfirmPassword" class="form-control bg-transparent" type="password" placeholder="Confirm Password" required />
+                    <label asp-for="ConfirmPassword"></label>
+                    <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                </div>
+
+                <button type="submit" class="btn btn-primary-gradient w-100 py-3 mb-3">Register</button>
+            </form>
+
+            <div class="text-center">
+                <span class="text-secondary small">Already have an account? </span>
+                <a asp-action="Login" class="small text-decoration-none">Log In</a>
+            </div>
+        </div>
+    </div>
+</div>

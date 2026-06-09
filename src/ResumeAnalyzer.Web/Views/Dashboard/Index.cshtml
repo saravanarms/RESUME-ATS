@@ -1,0 +1,201 @@
+@model DashboardViewModel
+@{
+    ViewData["Title"] = "Candidate Dashboard";
+}
+
+<div class="row mb-5 animate-fade-in-up">
+    <div class="col-12 d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div>
+            <h1 class="fw-extrabold" style="font-family: 'Outfit', sans-serif;">Candidate Dashboard</h1>
+            <p class="text-secondary mb-0">Overview of your resume performance and ATS audits</p>
+        </div>
+        <a asp-controller="Resume" asp-action="Upload" class="btn btn-primary-gradient px-4 py-3">
+            <i class="bi bi-cloud-arrow-up-fill me-2"></i>Analyze New Resume
+        </a>
+    </div>
+</div>
+
+<!-- Stats row -->
+<div class="row g-4 mb-5 animate-fade-in-up" style="animation-delay: 0.1s;">
+    <div class="col-md-4">
+        <div class="glass-card p-4 h-100 d-flex align-items-center justify-content-between">
+            <div>
+                <span class="text-secondary small fw-semibold text-uppercase tracking-wider d-block mb-1">Total Resumes</span>
+                <span class="display-5 fw-bold" style="font-family: 'Outfit', sans-serif;">@Model.TotalResumes</span>
+            </div>
+            <div class="bg-primary bg-opacity-10 p-3 rounded-circle text-primary">
+                <i class="bi bi-file-earmark-person fs-2"></i>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="glass-card p-4 h-100 d-flex align-items-center justify-content-between">
+            <div>
+                <span class="text-secondary small fw-semibold text-uppercase tracking-wider d-block mb-1">Average ATS Score</span>
+                <span class="display-5 fw-bold @(Model.AverageAtsScore >= 70 ? "text-success" : "text-warning")" style="font-family: 'Outfit', sans-serif;">@Model.AverageAtsScore%</span>
+            </div>
+            <div class="bg-success bg-opacity-10 p-3 rounded-circle text-success">
+                <i class="bi bi-speedometer2 fs-2"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="glass-card p-4 h-100 d-flex align-items-center justify-content-between">
+            <div>
+                <span class="text-secondary small fw-semibold text-uppercase tracking-wider d-block mb-1">Success Rating</span>
+                <span class="display-6 fw-bold" style="font-family: 'Outfit', sans-serif;">
+                    @if (Model.AverageAtsScore >= 90) { <span class="text-success">Excellent</span> }
+                    else if (Model.AverageAtsScore >= 70) { <span class="text-primary">Good</span> }
+                    else if (Model.AverageAtsScore >= 50) { <span class="text-warning">Average</span> }
+                    else { <span class="text-danger">Needs Work</span> }
+                </span>
+            </div>
+            <div class="bg-accent bg-opacity-10 p-3 rounded-circle text-accent">
+                <i class="bi bi-award fs-2"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts & Recent Analyses row -->
+<div class="row g-4 mb-5 animate-fade-in-up" style="animation-delay: 0.2s;">
+    <!-- ATS Score Trend Chart -->
+    <div class="col-lg-7">
+        <div class="glass-card p-4 h-100">
+            <h4 class="fw-bold mb-4" style="font-family: 'Outfit', sans-serif;">ATS Performance Trend</h4>
+            <div style="height: 300px; position: relative;">
+                <canvas id="atsTrendChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Analyses Table -->
+    <div class="col-lg-5">
+        <div class="glass-card p-4 h-100">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="fw-bold mb-0" style="font-family: 'Outfit', sans-serif;">Recent Analyses</h4>
+                <a asp-controller="Resume" asp-action="History" class="small text-decoration-none">View All</a>
+            </div>
+            
+            @if (Model.RecentAnalyses.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table glass-table align-middle">
+                        <thead>
+                            <tr>
+                                <th>Resume Name</th>
+                                <th class="text-center">Score</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var analysis in Model.RecentAnalyses)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="text-truncate fw-semibold" style="max-width: 160px;">@analysis.ResumeName</div>
+                                        <span class="text-muted small">@analysis.DateAnalyzed.ToString("MMM dd, yyyy")</span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge @(analysis.AtsScore >= 90 ? "badge-excellent" : (analysis.AtsScore >= 70 ? "badge-good" : (analysis.AtsScore >= 50 ? "badge-average" : "badge-poor"))) rounded-pill px-3 py-2">
+                                            @analysis.AtsScore%
+                                        </span>
+                                    </td>
+                                    <td class="text-end">
+                                        <a asp-controller="Resume" asp-action="Result" asp-route-id="@analysis.AnalysisId" class="btn btn-sm btn-outline-primary px-3 rounded-pill">
+                                            View Report
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5">
+                    <i class="bi bi-file-earmark-bar-graph text-muted display-4 mb-3 d-block"></i>
+                    <p class="text-secondary">No analyses found. Upload your first resume to see metrics.</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const ctx = document.getElementById('atsTrendChart');
+            if (!ctx) return;
+
+            // Extract data points from model
+            const labels = [];
+            const dataPoints = [];
+
+            @foreach (var pt in Model.TrendPoints)
+            {
+                <text>
+                labels.push("@pt.DateLabel");
+                dataPoints.push(@pt.Score);
+                </text>
+            }
+
+            // Fallback mock labels if empty
+            if (labels.length === 0) {
+                labels.push("No Data");
+                dataPoints.push(0);
+            }
+
+            // Configure gradient color
+            const chartCtx = ctx.getContext('2d');
+            const gradient = chartCtx.createLinearGradient(0, 0, 0, 300);
+            gradient.addColorStop(0, 'rgba(37, 99, 235, 0.4)');
+            gradient.addColorStop(1, 'rgba(37, 99, 235, 0.02)');
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'ATS Match Score (%)',
+                        data: dataPoints,
+                        borderColor: '#2563eb',
+                        borderWidth: 3,
+                        backgroundColor: gradient,
+                        fill: true,
+                        tension: 0.3,
+                        pointBackgroundColor: '#2563eb',
+                        pointBorderColor: '#ffffff',
+                        pointBorderWidth: 2,
+                        pointRadius: 6,
+                        pointHoverRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            min: 0,
+                            max: 100,
+                            grid: { color: 'rgba(148, 163, 184, 0.1)' },
+                            ticks: { font: { family: 'Inter' } }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { font: { family: 'Inter' } }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+}

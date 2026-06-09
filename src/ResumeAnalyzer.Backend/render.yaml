@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: resume-analyzer-ai-service
+    env: docker
+    dockerfilePath: ./src/ResumeAnalyzer.Backend/Dockerfile
+    context: ./src/ResumeAnalyzer.Backend
+    plan: free
+    envVars:
+      - key: JWT_SECRET
+        generateValue: true
+      - key: RATE_LIMIT_REQUESTS
+        value: "100"
+      - key: RATE_LIMIT_WINDOW_SECONDS
+        value: "60"

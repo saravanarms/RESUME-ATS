@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  database:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: resume_analyzer_db
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=YourSecurePass123!
+    ports:
+      - "1433:1433"
+    volumes:
+      - mssql_data:/var/opt/mssql
+
+  backend:
+    build:
+      context: ./src/ResumeAnalyzer.Backend
+      dockerfile: Dockerfile
+    container_name: resume_analyzer_backend
+    ports:
+      - "8000:8000"
+    environment:
+      - JWT_SECRET=3aef34f19b88cd26e8524a87268d876d75c7429671d603a11b6d573d8a54d5ab
+      - RATE_LIMIT_REQUESTS=100
+      - RATE_LIMIT_WINDOW_SECONDS=60
+    depends_on:
+      - database
+
+  frontend:
+    build:
+      context: .
+      dockerfile: src/ResumeAnalyzer.Web/Dockerfile
+    container_name: resume_analyzer_frontend
+    ports:
+      - "8080:8080"
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=database;Database=ResumeAnalyzerDb;User Id=sa;Password=YourSecurePass123!;TrustServerCertificate=True
+      - BackendService__BaseUrl=http://backend:8000
+      - BackendService__JwtSecret=3aef34f19b88cd26e8524a87268d876d75c7429671d603a11b6d573d8a54d5ab
+    depends_on:
+      - database
+      - backend
+
+volumes:
+  mssql_data:

@@ -1,0 +1,106 @@
+@{
+    ViewData["Title"] = "Upload and Match Resume";
+}
+
+<div class="row justify-content-center animate-fade-in-up">
+    <div class="col-lg-8">
+        <div class="glass-card p-5">
+            <div class="text-center mb-5">
+                <i class="bi bi-file-earmark-arrow-up text-primary display-4 mb-2"></i>
+                <h2 class="fw-bold" style="font-family: 'Outfit', sans-serif;">Analyze Your Resume</h2>
+                <p class="text-secondary">Upload your PDF/DOCX file and match it against the job description</p>
+            </div>
+
+            <form asp-controller="Resume" asp-action="Upload" method="post" enctype="multipart/form-data" id="uploadForm">
+                @Html.AntiForgeryToken()
+                
+                <div class="mb-4">
+                    <label class="form-label fw-bold">1. Target Job Title (Optional)</label>
+                    <input type="text" name="jobTitle" class="form-control bg-transparent py-3" placeholder="e.g. Senior Full-Stack Engineer" />
+                </div>
+
+                <!-- Drag & Drop Zone -->
+                <div class="mb-5">
+                    <label class="form-label fw-bold">2. Upload Resume File (PDF or DOCX)</label>
+                    <div class="upload-zone" id="upload-zone">
+                        <i class="bi bi-cloud-arrow-up display-3 text-primary mb-3 d-block"></i>
+                        <h5 class="fw-bold">Drag and drop your file here</h5>
+                        <p class="text-secondary small mb-3">or browse from your local drive</p>
+                        <button class="btn btn-outline-primary rounded-pill px-4" id="file-select-btn">Browse File</button>
+                        <input type="file" name="file" id="resume-file-input" class="d-none" accept=".pdf,.docx" required />
+                    </div>
+                    
+                    <!-- File Preview Card (Hidden initially) -->
+                    <div class="card border border-primary border-opacity-25 bg-transparent p-4 d-none" id="upload-preview">
+                        <div id="upload-details"></div>
+                        <div class="text-center">
+                            <button class="btn btn-sm btn-outline-danger px-4 rounded-pill" id="remove-file-btn">
+                                <i class="bi bi-trash-fill me-1"></i>Remove File
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Job Description Paste -->
+                <div class="mb-5">
+                    <label class="form-label fw-bold">3. Paste Job Description</label>
+                    <textarea name="jobDescription" class="form-control bg-transparent" rows="8" placeholder="Paste the full job description text here including skills, tools, and experience requirements..." required style="resize: none;"></textarea>
+                </div>
+
+                <!-- Progress Bar Simulator (Hidden initially) -->
+                <div class="progress mb-4 d-none" style="height: 10px;" id="analysis-progress-bar">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" style="width: 0%"></div>
+                </div>
+                <div class="text-center text-secondary small mb-4 d-none" id="analysis-status-text">
+                    <i class="bi bi-gear-fill spin-me me-1"></i> Running AI scoring engines...
+                </div>
+
+                <button type="submit" class="btn btn-primary-gradient w-100 py-3 btn-lg fw-bold" id="submit-btn">
+                    Run ATS Audit
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .spin-me {
+        animation: spin 2s linear infinite;
+        display: inline-block;
+    }
+    @@keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+</style>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const form = document.getElementById("uploadForm");
+            const submitBtn = document.getElementById("submit-btn");
+            const progressBar = document.getElementById("analysis-progress-bar");
+            const progressBarInner = progressBar?.querySelector(".progress-bar");
+            const statusText = document.getElementById("analysis-status-text");
+
+            if (form) {
+                form.addEventListener("submit", (e) => {
+                    // Show progress bars and status
+                    submitBtn.disabled = true;
+                    if (progressBar) progressBar.classList.remove("d-none");
+                    if (statusText) statusText.classList.remove("d-none");
+
+                    let progress = 0;
+                    const interval = setInterval(() => {
+                        progress += 10;
+                        if (progress <= 90) {
+                            if (progressBarInner) progressBarInner.style.width = progress + "%";
+                        }
+                    }, 400);
+
+                    // Allow normal postback submission
+                });
+            }
+        });
+    </script>
+}
