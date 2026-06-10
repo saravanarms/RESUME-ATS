@@ -1,7 +1,6 @@
-// Configuration - Auto-detects local vs production Render URL
 const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
     ? 'http://127.0.0.1:8000' 
-    : 'https://resume-analyzer-ai-service.onrender.com'; // Replace with your production Render URL if different
+    : 'https://resume-ats-p6eb.onrender.com'; // Replace with your production Render URL if different
 
 let selectedFile = null;
 
