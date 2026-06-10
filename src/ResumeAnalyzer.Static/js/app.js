@@ -116,7 +116,7 @@ async function handleAnalyze() {
     document.getElementById("btn-analyze").disabled = true;
 
     try {
-        const response = await fetch(`${API_BASE_URL}/api/v1/resume/compare-job-description`, {
+        const response = await fetch(`${API_BASE_URL}/api/v1/compare-job-description`, {
             method: "POST",
             body: formData
         });
