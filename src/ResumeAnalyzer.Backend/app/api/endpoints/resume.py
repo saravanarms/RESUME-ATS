@@ -11,13 +11,12 @@ router = APIRouter()
 nlp_service = NLPService()
 scoring_service = ScoringService(nlp_service)
 
-# In-memory store for demo/stateless fallback of analysis history (in production, Azure SQL is used)
+# In-memory store for demo/stateless fallback of analysis history
 IN_MEMORY_HISTORY: Dict[str, Dict[str, Any]] = {}
 
 @router.post("/upload-resume")
 async def upload_resume(
-    file: UploadFile = File(...),
-    current_user: dict = Depends(get_current_user)
+    file: UploadFile = File(...)
 ):
     """
     Uploads a resume file, validates it, extracts metadata, and returns the result.
@@ -51,8 +50,7 @@ async def upload_resume(
 
 @router.post("/extract-text")
 async def extract_text(
-    file: UploadFile = File(...),
-    current_user: dict = Depends(get_current_user)
+    file: UploadFile = File(...)
 ):
     """
     Extracts and returns plain text from a resume file.
@@ -77,8 +75,7 @@ async def extract_text(
 @router.post("/analyze-resume")
 async def analyze_resume(
     file: Optional[UploadFile] = File(None),
-    text: Optional[str] = Form(None),
-    current_user: dict = Depends(get_current_user)
+    text: Optional[str] = Form(None)
 ):
     """
     Analyzes resume text (or uploaded file) to extract skills, experience, education, etc.
@@ -113,8 +110,7 @@ async def analyze_resume(
 async def compare_job_description(
     file: Optional[UploadFile] = File(None),
     resume_text: Optional[str] = Form(None),
-    job_description: str = Form(...),
-    current_user: dict = Depends(get_current_user)
+    job_description: str = Form(...)
 ):
     """
     Compares a resume (file or text) against a Job Description to generate ATS score and suggestions.
@@ -143,7 +139,7 @@ async def compare_job_description(
         analysis_id = str(uuid.uuid4())
         record = {
             "id": analysis_id,
-            "user_id": current_user["user_id"],
+            "user_id": "anonymous",
             "filename": filename,
             "date": datetime.utcnow().isoformat(),
             "ats_score": score_result["ats_score"],
@@ -165,19 +161,15 @@ async def compare_job_description(
         )
 
 @router.get("/analysis-history")
-async def get_analysis_history(current_user: dict = Depends(get_current_user)):
+async def get_analysis_history():
     """
-    Retrieves user's analysis history records.
+    Retrieves analysis history records.
     """
-    user_id = current_user["user_id"]
-    user_records = [
-        rec for rec in IN_MEMORY_HISTORY.values() 
-        if rec["user_id"] == user_id
-    ]
+    user_records = list(IN_MEMORY_HISTORY.values())
     return sorted(user_records, key=lambda x: x["date"], reverse=True)
 
 @router.delete("/analysis/{id}")
-async def delete_analysis(id: str, current_user: dict = Depends(get_current_user)):
+async def delete_analysis(id: str):
     """
     Deletes a specific analysis record from the history.
     """
@@ -187,12 +179,6 @@ async def delete_analysis(id: str, current_user: dict = Depends(get_current_user
             detail="Analysis record not found."
         )
         
-    record = IN_MEMORY_HISTORY[id]
-    if record["user_id"] != current_user["user_id"] and current_user.get("role") != "Admin":
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="You do not have permission to delete this analysis."
-        )
-        
     del IN_MEMORY_HISTORY[id]
     return {"message": "Analysis record deleted successfully."}
+
